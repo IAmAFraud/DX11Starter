@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Vertex.h"
+#include "Mesh.h"
 #include "Input.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
@@ -174,7 +175,6 @@ void Game::CreateBasicGeometry()
 	//    in the correct order and each one will be used exactly once
 	// - But just to see how it's done...
 	unsigned int indices[] = { 0, 1, 2 };
-
 
 	// Create the VERTEX BUFFER description -----------------------------------
 	// - The description is created on the stack because we only need
