@@ -1,6 +1,5 @@
 #include "Game.h"
 #include "Vertex.h"
-#include "Mesh.h"
 #include "Input.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
@@ -27,6 +26,10 @@ Game::Game(HINSTANCE hInstance)
 		true),			   // Show extra stats (fps) in title bar?
 	vsync(false)
 {
+	triangle = nullptr;
+	rectangle = nullptr;
+	cursedShape = nullptr;
+
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
@@ -45,7 +48,12 @@ Game::~Game()
 	// we don't need to explicitly clean up those DirectX objects
 	// - If we weren't using smart pointers, we'd need
 	//   to call Release() on each DirectX object created in Game
-
+	delete triangle;
+	triangle = nullptr;
+	delete rectangle;
+	rectangle = nullptr;
+	delete cursedShape;
+	cursedShape = nullptr;
 }
 
 // --------------------------------------------------------
@@ -162,11 +170,11 @@ void Game::CreateBasicGeometry()
 	//    knowing the exact size (in pixels) of the image/window/etc.  
 	// - Long story short: Resizing the window also resizes the triangle,
 	//    since we're describing the triangle in terms of the window itself
-	Vertex vertices[] =
+	Vertex vertices1[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.5f, +0.0f), red },
-		{ XMFLOAT3(+0.5f, -0.5f, +0.0f), blue },
-		{ XMFLOAT3(-0.5f, -0.5f, +0.0f), green },
+		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
+		{ XMFLOAT3(-0.5f, +0.0f, +0.0f), blue },
+		{ XMFLOAT3(-0.9f, +0.0f, +0.0f), green },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -174,8 +182,41 @@ void Game::CreateBasicGeometry()
 	// - Indices are technically not required if the vertices are in the buffer 
 	//    in the correct order and each one will be used exactly once
 	// - But just to see how it's done...
-	unsigned int indices[] = { 0, 1, 2 };
+	unsigned int indices1[] = { 0, 1, 2 };
 
+	//triangle = std::make_shared<Mesh>(vertices, 3, indices, 3, device, context);
+	triangle = new Mesh(vertices1, 3, indices1, 3, device, context);
+
+
+	// Rectangle
+	Vertex vertices2[] =
+	{
+		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), red },
+		{ XMFLOAT3(+0.7f, +0.7f, +0.0f), blue },
+		{ XMFLOAT3(+0.7f, +0.2f, +0.0f), red },
+		{ XMFLOAT3(+0.4f, +0.2f, +0.0f), blue }
+	};
+
+	unsigned int indices2[] = { 0, 1, 2, 2, 3, 0};
+
+	rectangle = new Mesh(vertices2, 4, indices2, 6, device, context);
+
+	// Cursed Shape
+	Vertex vertices3[] =
+	{
+		{ XMFLOAT3(+0.0f, +0.6f, +0.0f), red},
+		{ XMFLOAT3(-0.4f, +0.0f, +0.0f), blue},
+		{ XMFLOAT3(+0.0f, +0.0f, +0.0f), blue},
+		{ XMFLOAT3(+0.4f, +0.0f, +0.0f), blue},
+		{ XMFLOAT3(-0.2f, -0.7f, +0.0f), green},
+		{ XMFLOAT3(+0.2f, -0.7f, +0.0f), green},
+	};
+
+	unsigned int indices3[] = { 1, 0, 3, 1, 2, 4, 2, 3, 5};
+
+	cursedShape = new Mesh(vertices3, 6, indices3, 9, device, context);
+
+	/*
 	// Create the VERTEX BUFFER description -----------------------------------
 	// - The description is created on the stack because we only need
 	//    it to create the buffer.  The description is then useless.
@@ -217,7 +258,7 @@ void Game::CreateBasicGeometry()
 	// Actually create the buffer with the initial data
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
 	device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
-
+	*/
 }
 
 
@@ -275,7 +316,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-
+	/*
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
@@ -297,8 +338,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		3,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
+	*/
 
-
+	triangle->Draw();
+	rectangle->Draw();
+	cursedShape->Draw();
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
