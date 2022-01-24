@@ -263,7 +263,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Loop through all meshes and call their draw method
 	for (int i = 0; i < meshes.size(); i++)
 	{
-		std::static_pointer_cast<Mesh>(meshes[i])->Draw();
+		meshes[i]->Draw();
 	}
 
 	// Present the back buffer to the user
