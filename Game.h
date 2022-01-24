@@ -42,6 +42,9 @@ private:
 	// Buffers to hold actual geometry data
 	Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
+
+	// Constant Buffers
+	Microsoft::WRL::ComPtr<ID3D11Buffer> constantBufferVS;
 	
 	// Shaders and shader-related constructs
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
