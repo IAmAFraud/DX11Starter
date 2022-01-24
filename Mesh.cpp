@@ -1,6 +1,14 @@
 #include "Mesh.h"
 
-
+/// <summary>
+/// Parameterized Constructor for the Mesh
+/// </summary>
+/// <param name="_vertices">A collection of vertices to be used in the mesh</param>
+/// <param name="_numVertices">The number of vertices in the mesh</param>
+/// <param name="_indices">A collection of unsigned ints that determine the order to use the vertices in</param>
+/// <param name="_numIndices">The number of indices in drawing the mesh</param>
+/// <param name="_device">A reference to the device object</param>
+/// <param name="_context">A reference to the context object</param>
 Mesh::Mesh(Vertex* _vertices, int _numVertices, unsigned int* _indices, int _numIndices, Microsoft::WRL::ComPtr<ID3D11Device> _device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> _context)
 {
 	// Connect appropriate fields
@@ -42,25 +50,39 @@ Mesh::Mesh(Vertex* _vertices, int _numVertices, unsigned int* _indices, int _num
 	_device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
 }
 
-
+// Deconstructor (Currently empty as all pointers delete themselves)
 Mesh::~Mesh()
 {
-
 }
 
+/// <summary>
+/// Returns a reference to the mesh's vertex buffer
+/// </summary>
+Microsoft::WRL::ComPtr<ID3D11Buffer> Mesh::GetVertexBuffer()
+{
+	return vertexBuffer;
+}
 
-// Mesh::GetVertexBuffer
+/// <summary>
+/// Returns a reference to the mesh's index buffer
+/// </summary>
+/// <returns></returns>
+Microsoft::WRL::ComPtr<ID3D11Buffer> Mesh::GetIndexBuffer()
+{
+	return indexBuffer;
+}
 
-
-// Mesh::GetIndexBuffer
-
-
+/// <summary>
+/// Returns the number of indices in the mesh
+/// </summary>
 int Mesh::GetIndexCount()
 {
 	return numIndices;
 }
 
-
+/// <summary>
+/// Takes the two buffers and draws the mesh to the screen
+/// </summary>
 void Mesh::Draw()
 {
 	// Sets the Buffers in context

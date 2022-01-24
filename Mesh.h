@@ -4,15 +4,18 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
+// Purpose is create and store the buffers for objects to be drawn to the screen
 class Mesh
 {
 	private:
+		// Fields
 		Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 		int numIndices;
 
 	public:
+		// Constructor
 		Mesh(
 			Vertex* _vertices,
 			int _numVertices,
@@ -22,9 +25,9 @@ class Mesh
 			Microsoft::WRL::ComPtr<ID3D11DeviceContext> _context);
 		~Mesh(); // Deconstructor
 
-		// GetVertexBuffer();	// Need DataType
-		// GetIndexBuffer();	// Need DataType
+		// Functions
+		Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer();
+		Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 		int GetIndexCount();
 		void Draw();
 };
-

@@ -26,10 +26,6 @@ Game::Game(HINSTANCE hInstance)
 		true),			   // Show extra stats (fps) in title bar?
 	vsync(false)
 {
-	triangle = nullptr;
-	rectangle = nullptr;
-	cursedShape = nullptr;
-
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
 	CreateConsoleWindow(500, 120, 32, 120);
@@ -47,13 +43,7 @@ Game::~Game()
 	// Note: Since we're using smart pointers (ComPtr),
 	// we don't need to explicitly clean up those DirectX objects
 	// - If we weren't using smart pointers, we'd need
-	//   to call Release() on each DirectX object created in Game
-	delete triangle;
-	triangle = nullptr;
-	delete rectangle;
-	rectangle = nullptr;
-	delete cursedShape;
-	cursedShape = nullptr;
+	//   to call Release() on each DirectX object created in Gametr
 }
 
 // --------------------------------------------------------
@@ -184,9 +174,7 @@ void Game::CreateBasicGeometry()
 	// - But just to see how it's done...
 	unsigned int indices1[] = { 0, 1, 2 };
 
-	//triangle = std::make_shared<Mesh>(vertices, 3, indices, 3, device, context);
-	triangle = new Mesh(vertices1, 3, indices1, 3, device, context);
-
+	meshes.push_back(std::make_shared<Mesh>(vertices1, sizeof(vertices1)/sizeof(Vertex), indices1, sizeof(indices1)/sizeof(unsigned int), device, context));
 
 	// Rectangle
 	Vertex vertices2[] =
@@ -199,7 +187,7 @@ void Game::CreateBasicGeometry()
 
 	unsigned int indices2[] = { 0, 1, 2, 2, 3, 0};
 
-	rectangle = new Mesh(vertices2, 4, indices2, 6, device, context);
+	meshes.push_back(std::make_shared<Mesh>(vertices2, sizeof(vertices2)/sizeof(Vertex), indices2, sizeof(indices2)/sizeof(unsigned int), device, context));
 
 	// Cursed Shape
 	Vertex vertices3[] =
@@ -214,51 +202,7 @@ void Game::CreateBasicGeometry()
 
 	unsigned int indices3[] = { 1, 0, 3, 1, 2, 4, 2, 3, 5};
 
-	cursedShape = new Mesh(vertices3, 6, indices3, 9, device, context);
-
-	/*
-	// Create the VERTEX BUFFER description -----------------------------------
-	// - The description is created on the stack because we only need
-	//    it to create the buffer.  The description is then useless.
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(Vertex) * 3;       // 3 = number of vertices in the buffer
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER; // Tells DirectX this is a vertex buffer
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-
-	// Create the proper struct to hold the initial vertex data
-	// - This is how we put the initial data into the buffer
-	D3D11_SUBRESOURCE_DATA initialVertexData = {};
-	initialVertexData.pSysMem = vertices;
-
-	// Actually create the buffer with the initial data
-	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	device->CreateBuffer(&vbd, &initialVertexData, vertexBuffer.GetAddressOf());
-
-
-
-	// Create the INDEX BUFFER description ------------------------------------
-	// - The description is created on the stack because we only need
-	//    it to create the buffer.  The description is then useless.
-	D3D11_BUFFER_DESC ibd = {};
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = sizeof(unsigned int) * 3;	// 3 = number of indices in the buffer
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;	// Tells DirectX this is an index buffer
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
-
-	// Create the proper struct to hold the initial index data
-	// - This is how we put the initial data into the buffer
-	D3D11_SUBRESOURCE_DATA initialIndexData = {};
-	initialIndexData.pSysMem = indices;
-
-	// Actually create the buffer with the initial data
-	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
-	device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
-	*/
+	meshes.push_back(std::make_shared<Mesh>(vertices3, sizeof(vertices3)/sizeof(Vertex), indices3, sizeof(indices3)/sizeof(unsigned int), device, context));
 }
 
 
@@ -316,33 +260,11 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-	/*
-	// Set buffers in the input assembler
-	//  - Do this ONCE PER OBJECT you're drawing, since each object might
-	//    have different geometry.
-	//  - for this demo, this step *could* simply be done once during Init(),
-	//    but I'm doing it here because it's often done multiple times per frame
-	//    in a larger application/game
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-
-	// Finally do the actual drawing
-	//  - Do this ONCE PER OBJECT you intend to draw
-	//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-	//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-	//     vertices in the currently set VERTEX BUFFER
-	context->DrawIndexed(
-		3,     // The number of indices to use (we could draw a subset if we wanted)
-		0,     // Offset to the first index we want to use
-		0);    // Offset to add to each index when looking up vertices
-	*/
-
-	triangle->Draw();
-	rectangle->Draw();
-	cursedShape->Draw();
+	// Loop through all meshes and call their draw method
+	for (int i = 0; i < meshes.size(); i++)
+	{
+		std::static_pointer_cast<Mesh>(meshes[i])->Draw();
+	}
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it

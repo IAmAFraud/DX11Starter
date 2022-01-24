@@ -5,6 +5,7 @@
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
+#include <vector>
 
 class Game 
 	: public DXCore
@@ -30,15 +31,8 @@ private:
 	void LoadShaders(); 
 	void CreateBasicGeometry();
 
-	/* Convert to Shared Pointers Later
-	std::shared_ptr<Mesh> triangle;
-	std::shared_ptr<Mesh> rectangle;
-	std::shared_ptr<Mesh> cursedShape;
-	*/
-
-	Mesh *triangle;
-	Mesh *rectangle;
-	Mesh *cursedShape;
+	// Vector that contains all the list items
+	std::vector < std::shared_ptr<Mesh> > meshes;
 
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the
