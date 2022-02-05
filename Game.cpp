@@ -25,6 +25,7 @@ Game::Game(HINSTANCE hInstance)
 		1280,			   // Width of the window's client area
 		720,			   // Height of the window's client area
 		true),			   // Show extra stats (fps) in title bar?
+	transform(),		   // Initializes the test transform
 	vsync(false)
 {
 #if defined(DEBUG) || defined(_DEBUG)
@@ -240,6 +241,12 @@ void Game::Update(float deltaTime, float totalTime)
 	// Example input checking: Quit if the escape key is pressed
 	if (Input::GetInstance().KeyDown(VK_ESCAPE))
 		Quit();
+
+	// Updates the test transform
+	transform.SetPosition(sin(totalTime), 0, 0);
+	float scale = cos(totalTime) * 0.5f + 0.5f;
+	transform.SetScale(scale, scale, scale);
+	transform.Rotate(0, 0, deltaTime * 0.1f);
 }
 
 // --------------------------------------------------------
@@ -280,7 +287,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Create a variable of the VertexShaderExternalData struct
 	VertexShaderExternalData vsData;
 	vsData.colorTint = XMFLOAT4(0.25f, 1.0f, 0.25f, 1.0f);
-	vsData.offset = XMFLOAT3(0.0f, -0.5f, 0.0f);
+	vsData.worldMatrix = transform.GetWorldMatrix();
 
 	// Copy the data to the DirectX resource
 	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
