@@ -3,6 +3,7 @@
 #include "DXCore.h"
 #include "Mesh.h"
 #include "Transform.h"
+#include "Entity.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -33,8 +34,7 @@ private:
 	void CreateBasicGeometry();
 
 	// Vector that contains all the list items
-	std::vector < std::shared_ptr<Mesh> > meshes;
-	Transform transform; // Test Transform
+	std::vector < std::shared_ptr<Entity> > entities;
 
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the

@@ -25,7 +25,6 @@ Game::Game(HINSTANCE hInstance)
 		1280,			   // Width of the window's client area
 		720,			   // Height of the window's client area
 		true),			   // Show extra stats (fps) in title bar?
-	transform(),		   // Initializes the test transform
 	vsync(false)
 {
 #if defined(DEBUG) || defined(_DEBUG)
@@ -190,8 +189,7 @@ void Game::CreateBasicGeometry()
 	//    in the correct order and each one will be used exactly once
 	// - But just to see how it's done...
 	unsigned int indices1[] = { 0, 1, 2 };
-
-	meshes.push_back(std::make_shared<Mesh>(vertices1, sizeof(vertices1)/sizeof(Vertex), indices1, sizeof(indices1)/sizeof(unsigned int), device, context));
+	std::shared_ptr<Mesh> mesh1 = std::make_shared<Mesh>(vertices1, sizeof(vertices1)/sizeof(Vertex), indices1, sizeof(indices1)/sizeof(unsigned int), device, context);
 
 	// Rectangle
 	Vertex vertices2[] =
@@ -203,8 +201,7 @@ void Game::CreateBasicGeometry()
 	};
 
 	unsigned int indices2[] = { 0, 1, 2, 2, 3, 0};
-
-	meshes.push_back(std::make_shared<Mesh>(vertices2, sizeof(vertices2)/sizeof(Vertex), indices2, sizeof(indices2)/sizeof(unsigned int), device, context));
+	std::shared_ptr<Mesh> mesh2 = std::make_shared<Mesh>(vertices2, sizeof(vertices2) / sizeof(Vertex), indices2, sizeof(indices2) / sizeof(unsigned int), device, context);
 
 	// Cursed Shape
 	Vertex vertices3[] =
@@ -218,8 +215,14 @@ void Game::CreateBasicGeometry()
 	};
 
 	unsigned int indices3[] = { 1, 0, 3, 1, 2, 4, 2, 3, 5};
+	std::shared_ptr<Mesh> mesh3 = std::make_shared<Mesh>(vertices3, sizeof(vertices3)/sizeof(Vertex), indices3, sizeof(indices3)/sizeof(unsigned int), device, context);
 
-	meshes.push_back(std::make_shared<Mesh>(vertices3, sizeof(vertices3)/sizeof(Vertex), indices3, sizeof(indices3)/sizeof(unsigned int), device, context));
+	// Creates 5 Entities
+	entities.push_back(std::make_shared<Entity>(mesh1));
+	entities.push_back(std::make_shared<Entity>(mesh1));
+	entities.push_back(std::make_shared<Entity>(mesh2));
+	entities.push_back(std::make_shared<Entity>(mesh2));
+	entities.push_back(std::make_shared<Entity>(mesh3));
 }
 
 
@@ -243,10 +246,19 @@ void Game::Update(float deltaTime, float totalTime)
 		Quit();
 
 	// Updates the test transform
+	/*
 	transform.SetPosition(sin(totalTime), 0, 0);
 	float scale = cos(totalTime) * 0.5f + 0.5f;
 	transform.SetScale(scale, scale, scale);
 	transform.Rotate(0, 0, deltaTime * 0.1f);
+	*/
+
+	entities[0]->GetTransform()->SetPosition(sin(totalTime), 0, 0);
+	entities[1]->GetTransform()->SetPosition(-sin(totalTime), 0, 0);
+	float scale = cos(totalTime) * 0.5f + 0.5f;
+	entities[2]->GetTransform()->SetScale(scale, scale, scale);
+	entities[3]->GetTransform()->MoveAbsolute(-0.5f * deltaTime, -0.5f * deltaTime, 0);
+	entities[4]->GetTransform()->Rotate(0, 0, deltaTime * 0.3f);
 }
 
 // --------------------------------------------------------
@@ -283,31 +295,44 @@ void Game::Draw(float deltaTime, float totalTime)
 	// - However, this isn't always the case (but might be for this course)
 	context->IASetInputLayout(inputLayout.Get());
 
-	// Updating the Constant Buffers
-	// Create a variable of the VertexShaderExternalData struct
-	VertexShaderExternalData vsData;
-	vsData.colorTint = XMFLOAT4(0.25f, 1.0f, 0.25f, 1.0f);
-	vsData.worldMatrix = transform.GetWorldMatrix();
-
-	// Copy the data to the DirectX resource
-	D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
-	context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-
-	memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-
-	context->Unmap(constantBufferVS.Get(), 0);
-
-	// Bind the constant buffer
-	context->VSSetConstantBuffers(
-		0,
-		1,
-		constantBufferVS.GetAddressOf());
-
-	// Loop through all meshes and call their draw method
-	for (int i = 0; i < meshes.size(); i++)
+	// Loop through all entities and draw their information
+	for (int i = 0; i < entities.size(); i++)
 	{
-		meshes[i]->Draw();
+		// Updating the Constant Buffers
+		// Create a variable of the VertexShaderExternalData struct
+		VertexShaderExternalData vsData;
+		vsData.colorTint = XMFLOAT4(0.25f, 1.0f, 0.25f, 1.0f);
+		vsData.worldMatrix = entities[i]->GetTransform()->GetWorldMatrix();
+
+		// Copy the data to the DirectX resource
+		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
+		context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
+
+		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
+
+		context->Unmap(constantBufferVS.Get(), 0);
+
+		// Bind the constant buffer
+		context->VSSetConstantBuffers(
+			0,
+			1,
+			constantBufferVS.GetAddressOf());
+
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+
+	
+		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		// Draws the mesh to the screen
+		context->DrawIndexed(
+			entities[i]->GetMesh()->GetIndexCount(),
+			0,
+			0);
 	}
+	
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
