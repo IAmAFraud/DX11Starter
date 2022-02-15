@@ -32,6 +32,9 @@ Game::Game(HINSTANCE hInstance)
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
 #endif
+
+	// Create a Camera
+	camera = std::make_shared<Camera>(0.0f, 0.0f, -5.0f, (float)width/height);
 }
 
 // --------------------------------------------------------
@@ -234,6 +237,9 @@ void Game::OnResize()
 {
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
+
+
+	camera->UpdateProjectionMatrix((float)width/height);
 }
 
 // --------------------------------------------------------
@@ -259,6 +265,8 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[2]->GetTransform()->SetScale(scale, scale, scale);
 	entities[3]->GetTransform()->MoveAbsolute(-0.5f * deltaTime, -0.5f * deltaTime, 0);
 	entities[4]->GetTransform()->Rotate(0, 0, deltaTime * 0.3f);
+
+	camera->Update(deltaTime);
 }
 
 // --------------------------------------------------------
@@ -303,13 +311,13 @@ void Game::Draw(float deltaTime, float totalTime)
 		VertexShaderExternalData vsData;
 		vsData.colorTint = XMFLOAT4(0.25f, 1.0f, 0.25f, 1.0f);
 		vsData.worldMatrix = entities[i]->GetTransform()->GetWorldMatrix();
+		vsData.viewMatrix = camera->GetViewMatrix();
+		vsData.projectionMatrix = camera->GetProjectionMatrix();
 
 		// Copy the data to the DirectX resource
 		D3D11_MAPPED_SUBRESOURCE mappedBuffer = {};
 		context->Map(constantBufferVS.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedBuffer);
-
 		memcpy(mappedBuffer.pData, &vsData, sizeof(vsData));
-
 		context->Unmap(constantBufferVS.Get(), 0);
 
 		// Bind the constant buffer
@@ -318,11 +326,11 @@ void Game::Draw(float deltaTime, float totalTime)
 			1,
 			constantBufferVS.GetAddressOf());
 
+		// Sets stride and offset
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
-
-	
+		// Sets the Vertex and Index Buffers
 		context->IASetVertexBuffers(0, 1, entities[i]->GetMesh()->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 

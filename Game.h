@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "Transform.h"
 #include "Entity.h"
+#include "Camera.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -35,6 +36,7 @@ private:
 
 	// Vector that contains all the list items
 	std::vector < std::shared_ptr<Entity> > entities;
+	std::shared_ptr<Camera> camera;
 
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the
