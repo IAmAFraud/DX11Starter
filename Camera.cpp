@@ -30,7 +30,7 @@ Camera::~Camera()
 }
 
 /// <summary>
-/// 
+/// Manages keyboard input and updates the matrices
 /// </summary>
 /// <param name="dt">Delta Time</param>
 void Camera::Update(float dt)
