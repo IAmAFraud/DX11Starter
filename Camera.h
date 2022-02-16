@@ -6,13 +6,13 @@
 class Camera
 {
 	public:
-		Camera(float x, float y, float z, float aspectRatio);
+		Camera(float x, float y, float z, float _aspectRatio, float _fieldOfView, float _nearPlane, float _farPlane);
 		~Camera();
 
 		// Update Methods
 		void Update(float dt);
 		void UpdateViewMatrix();
-		void UpdateProjectionMatrix(float aspectRatio);
+		void UpdateProjectionMatrix(float _aspectRatio);
 
 		// Getters
 		Transform* GetTransform();
@@ -26,5 +26,11 @@ class Camera
 
 		// Transformation info
 		Transform transform;
+
+		// Custimizable Variables
+		float aspectRatio;
+		float fieldOfView;
+		float nearPlane;
+		float farPlane;
 };
 

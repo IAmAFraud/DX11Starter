@@ -34,7 +34,7 @@ Game::Game(HINSTANCE hInstance)
 #endif
 
 	// Create a Camera
-	camera = std::make_shared<Camera>(0.0f, 0.0f, -5.0f, (float)width/height);
+	camera = std::make_shared<Camera>(0.0f, 0.0f, -5.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
 }
 
 // --------------------------------------------------------
