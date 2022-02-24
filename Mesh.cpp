@@ -79,21 +79,3 @@ int Mesh::GetIndexCount()
 {
 	return numIndices;
 }
-
-/// <summary>
-/// Takes the two buffers and draws the mesh to the screen
-/// </summary>
-void Mesh::Draw()
-{
-	// Sets the Buffers in context
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	context->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	// Draws the mesh to the screen
-	context->DrawIndexed(
-		numIndices,
-		0,
-		0);
-}

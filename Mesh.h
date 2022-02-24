@@ -29,5 +29,4 @@ class Mesh
 		Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer();
 		Microsoft::WRL::ComPtr<ID3D11Buffer> GetIndexBuffer();
 		int GetIndexCount();
-		void Draw();
 };

@@ -3,24 +3,18 @@
 /// <summary>
 /// Constructor for Entity. Takes a mesh pointer and creates its own transform
 /// </summary>
-Entity::Entity(std::shared_ptr<Mesh> _mesh) : transform()
+Entity::Entity(std::shared_ptr<Mesh> _mesh, std::shared_ptr<Material> _material) : transform()
 {
     mesh = _mesh;
+    material = _material;
 }
 
-/// <summary>
-/// Returns the mesh shared pointer
-/// </summary>
-std::shared_ptr<Mesh> Entity::GetMesh()
-{
-    return mesh;
-}
+// Getters
+Transform* Entity::GetTransform() { return &transform; }
+std::shared_ptr<Mesh> Entity::GetMesh() { return mesh; }
+std::shared_ptr<Material> Entity::GetMaterial() { return material; }
 
-
-/// <summary>
-/// Returns a pointer to this entities transform
-/// </summary
-Transform* Entity::GetTransform()
-{
-    return &transform;
-}
+// Setters
+void Entity::SetTransform(Transform _transform) { transform = _transform; }
+void Entity::SetMesh(std::shared_ptr<Mesh> _mesh) { mesh = _mesh; }
+void Entity::SetMaterial(std::shared_ptr<Material> _material) { material = _material; }
