@@ -109,9 +109,9 @@ void Game::CreateBasicGeometry()
 	//    since we're describing the triangle in terms of the window itself
 	Vertex vertices1[] =
 	{
-		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), red },
-		{ XMFLOAT3(-0.5f, +0.0f, +0.0f), blue },
-		{ XMFLOAT3(-0.9f, +0.0f, +0.0f), green },
+		{ XMFLOAT3(-0.7f, +0.7f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+		{ XMFLOAT3(-0.5f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+		{ XMFLOAT3(-0.9f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
 	};
 
 	// Set up the indices, which tell us which vertices to use and in which order
@@ -126,10 +126,10 @@ void Game::CreateBasicGeometry()
 	// Rectangle
 	Vertex vertices2[] =
 	{
-		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), red },
-		{ XMFLOAT3(+0.7f, +0.7f, +0.0f), blue },
-		{ XMFLOAT3(+0.7f, +0.2f, +0.0f), red },
-		{ XMFLOAT3(+0.4f, +0.2f, +0.0f), blue }
+		{ XMFLOAT3(+0.4f, +0.7f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+		{ XMFLOAT3(+0.7f, +0.7f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+		{ XMFLOAT3(+0.7f, +0.2f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) },
+		{ XMFLOAT3(+0.4f, +0.2f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0) }
 	};
 
 	unsigned int indices2[] = { 0, 1, 2, 2, 3, 0};
@@ -139,12 +139,12 @@ void Game::CreateBasicGeometry()
 	// Cursed Shape
 	Vertex vertices3[] =
 	{
-		{ XMFLOAT3(+0.0f, +0.6f, +0.0f), red},
-		{ XMFLOAT3(-0.4f, +0.0f, +0.0f), blue},
-		{ XMFLOAT3(+0.0f, +0.0f, +0.0f), blue},
-		{ XMFLOAT3(+0.4f, +0.0f, +0.0f), blue},
-		{ XMFLOAT3(-0.2f, -0.7f, +0.0f), green},
-		{ XMFLOAT3(+0.2f, -0.7f, +0.0f), green},
+		{ XMFLOAT3(+0.0f, +0.6f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
+		{ XMFLOAT3(-0.4f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
+		{ XMFLOAT3(+0.0f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
+		{ XMFLOAT3(+0.4f, +0.0f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
+		{ XMFLOAT3(-0.2f, -0.7f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
+		{ XMFLOAT3(+0.2f, -0.7f, +0.0f), XMFLOAT3(0,0,-1), XMFLOAT2(0,0)},
 	};
 
 	unsigned int indices3[] = { 1, 0, 3, 1, 2, 4, 2, 3, 5};
@@ -156,12 +156,19 @@ void Game::CreateBasicGeometry()
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader));
 
+	// Creates mesh from 3D object
+	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
+	meshes.push_back(mesh4);
+
 	// Creates 5 Entities
 	entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
 	entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
 	entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
 	entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
 	entities.push_back(std::make_shared<Entity>(meshes[2], materials[2]));
+
+
+	entities.push_back(std::make_shared<Entity>(meshes[3], materials[0]));
 }
 
 

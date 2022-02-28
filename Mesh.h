@@ -15,7 +15,7 @@ class Mesh
 		int numIndices;
 
 	public:
-		// Constructor
+		// Constructors
 		Mesh(
 			Vertex* _vertices,
 			int _numVertices,
@@ -23,6 +23,7 @@ class Mesh
 			int _numIndicies,
 			Microsoft::WRL::ComPtr<ID3D11Device> _device,
 			Microsoft::WRL::ComPtr<ID3D11DeviceContext> _context);
+		Mesh(const char* objFile, Microsoft::WRL::ComPtr<ID3D11Device> _device);
 		~Mesh(); // Deconstructor
 
 		// Functions
