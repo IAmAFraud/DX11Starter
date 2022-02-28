@@ -161,11 +161,11 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(mesh4);
 
 	// Creates 5 Entities
-	entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
-	entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
-	entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
-	entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
-	entities.push_back(std::make_shared<Entity>(meshes[2], materials[2]));
+	//entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
+	//entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
+	//entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
+	//entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
+	//entities.push_back(std::make_shared<Entity>(meshes[2], materials[2]));
 
 
 	entities.push_back(std::make_shared<Entity>(meshes[3], materials[0]));
@@ -202,12 +202,12 @@ void Game::Update(float deltaTime, float totalTime)
 	transform.Rotate(0, 0, deltaTime * 0.1f);
 	*/
 
-	entities[0]->GetTransform()->SetPosition(sin(totalTime), 0, 0);
-	entities[1]->GetTransform()->SetPosition(-sin(totalTime), 0, 0);
-	float scale = cos(totalTime) * 0.5f + 0.5f;
-	entities[2]->GetTransform()->SetScale(scale, scale, scale);
-	entities[3]->GetTransform()->MoveAbsolute(-0.5f * deltaTime, -0.5f * deltaTime, 0);
-	entities[4]->GetTransform()->Rotate(0, 0, deltaTime * 0.3f);
+	//entities[0]->GetTransform()->SetPosition(sin(totalTime), 0, 0);
+	//entities[1]->GetTransform()->SetPosition(-sin(totalTime), 0, 0);
+	//float scale = cos(totalTime) * 0.5f + 0.5f;
+	//entities[2]->GetTransform()->SetScale(scale, scale, scale);
+	//entities[3]->GetTransform()->MoveAbsolute(-0.5f * deltaTime, -0.5f * deltaTime, 0);
+	//entities[4]->GetTransform()->Rotate(0, 0, deltaTime * 0.3f);
 
 	camera->Update(deltaTime);
 }
@@ -253,14 +253,17 @@ void Game::Draw(float deltaTime, float totalTime)
 		entities[i]->GetMaterial()->GetVertexShader()->SetShader();
 		entities[i]->GetMaterial()->GetPixelShader()->SetShader();
 
-		// Defines the Shader data
+		// Defines the Vertex Shader data
 		std::shared_ptr<SimpleVertexShader> vs = entities[i]->GetMaterial()->GetVertexShader();
-		vs->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());
 		vs->SetMatrix4x4("world", entities[i]->GetTransform()->GetWorldMatrix());
 		vs->SetMatrix4x4("view", camera->GetViewMatrix());
 		vs->SetMatrix4x4("projection", camera->GetProjectionMatrix());
-
 		vs->CopyAllBufferData();
+
+		// Defines the Pixel Shader data
+		std::shared_ptr<SimplePixelShader> ps = entities[i]->GetMaterial()->GetPixelShader();
+		ps->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());
+		ps->CopyAllBufferData();
 
 		// Sets stride and offset
 		UINT stride = sizeof(Vertex);
