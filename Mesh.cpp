@@ -275,6 +275,8 @@ Mesh::Mesh(const char* objFile, Microsoft::WRL::ComPtr<ID3D11Device> _device)
 	// Create the Index Buffer with the appropriate data
 	_device->CreateBuffer(&ibd, &initialIndexData, indexBuffer.GetAddressOf());
 
+	numIndices = indexCounter;
+
 
 
 	// - At this point, "verts" is a vector of Vertex structs, and can be used
