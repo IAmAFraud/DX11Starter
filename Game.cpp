@@ -33,7 +33,7 @@ Game::Game(HINSTANCE hInstance)
 #endif
 
 	// Create a Camera
-	camera = std::make_shared<Camera>(0.0f, 0.0f, -5.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
+	camera = std::make_shared<Camera>(0.0f, 2.0f, -20.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
 }
 
 // --------------------------------------------------------
@@ -80,6 +80,7 @@ void Game::LoadShaders()
 	// Loads in the simple shaders
 	vertexShader = std::make_shared<SimpleVertexShader>(device, context, GetFullPathTo_Wide(L"VertexShader.cso").c_str());
 	pixelShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"PixelShader.cso").c_str());
+	customPS = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"CustomPS.cso").c_str());
 }
 
 
@@ -155,10 +156,21 @@ void Game::CreateBasicGeometry()
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f), vertexShader, customPS));
 
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	meshes.push_back(mesh4);
+	std::shared_ptr<Mesh> mesh5 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/helix.obj").c_str(), device);
+	meshes.push_back(mesh5);
+	std::shared_ptr<Mesh> mesh6 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cylinder.obj").c_str(), device);
+	meshes.push_back(mesh6);
+	std::shared_ptr<Mesh> mesh7 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/quad.obj").c_str(), device);
+	meshes.push_back(mesh7);
+	std::shared_ptr<Mesh> mesh8 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/quad_double_sided.obj").c_str(), device);
+	meshes.push_back(mesh8);
+	std::shared_ptr<Mesh> mesh9 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
+	meshes.push_back(mesh9);
 
 	// Creates 5 Entities
 	//entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
@@ -168,7 +180,12 @@ void Game::CreateBasicGeometry()
 	//entities.push_back(std::make_shared<Entity>(meshes[2], materials[2]));
 
 
-	entities.push_back(std::make_shared<Entity>(meshes[3], materials[0]));
+	entities.push_back(std::make_shared<Entity>(meshes[3], materials[3]));
+	entities.push_back(std::make_shared<Entity>(meshes[4], materials[2]));
+	entities.push_back(std::make_shared<Entity>(meshes[5], materials[0]));
+	entities.push_back(std::make_shared<Entity>(meshes[6], materials[0]));
+	entities.push_back(std::make_shared<Entity>(meshes[7], materials[2]));
+	entities.push_back(std::make_shared<Entity>(meshes[8], materials[3]));
 }
 
 
@@ -208,6 +225,19 @@ void Game::Update(float deltaTime, float totalTime)
 	//entities[2]->GetTransform()->SetScale(scale, scale, scale);
 	//entities[3]->GetTransform()->MoveAbsolute(-0.5f * deltaTime, -0.5f * deltaTime, 0);
 	//entities[4]->GetTransform()->Rotate(0, 0, deltaTime * 0.3f);
+
+	entities[0]->GetTransform()->SetPosition(-10.0f, 0.0f, 0.0f);
+	entities[1]->GetTransform()->SetPosition(-6.0f, 0.0f, 0.0f);
+	entities[2]->GetTransform()->SetPosition(-2.0f, 0.0f, 0.0f);
+	entities[3]->GetTransform()->SetPosition(2.0f, 0.0f, 0.0f);
+	entities[4]->GetTransform()->SetPosition(6.0f, 0.0f, 0.0f);
+	entities[5]->GetTransform()->SetPosition(10.0f, 0.0f, 0.0f);
+
+
+	std::shared_ptr<SimplePixelShader> ps = entities[0]->GetMaterial()->GetPixelShader();
+	ps->SetFloat("totalTime", totalTime);
+	ps = entities[5]->GetMaterial()->GetPixelShader();
+	ps->SetFloat("totalTime", totalTime);
 
 	camera->Update(deltaTime);
 }

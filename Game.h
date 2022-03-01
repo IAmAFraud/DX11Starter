@@ -54,6 +54,7 @@ private:
 	// Simple Shaders
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShader;
+	std::shared_ptr<SimplePixelShader> customPS;
 
 	/* Default Shaders
 	// Shaders and shader-related constructs
