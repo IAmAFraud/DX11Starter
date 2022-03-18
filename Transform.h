@@ -22,6 +22,7 @@ class Transform
 		DirectX::XMFLOAT3 GetPitchYawRoll();
 		DirectX::XMFLOAT3 GetScale();
 		DirectX::XMFLOAT4X4 GetWorldMatrix();
+		DirectX::XMFLOAT4X4 GetWorldInverseTranposeMatrix();
 		DirectX::XMFLOAT3 GetRight();
 		DirectX::XMFLOAT3 GetUp();
 		DirectX::XMFLOAT3 GetForward();
@@ -42,8 +43,12 @@ class Transform
 
 		// Finalized Matrix
 		DirectX::XMFLOAT4X4 worldMatrix;
+		DirectX::XMFLOAT4X4 worldInverseTranspose;
 
 		// Matrix Updated
 		bool matrixDirty;
+
+		// Helper Function
+		void CreateWorldMatrices();
 };
 

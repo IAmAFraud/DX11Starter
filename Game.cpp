@@ -34,6 +34,7 @@ Game::Game(HINSTANCE hInstance)
 
 	// Create a Camera
 	camera = std::make_shared<Camera>(0.0f, 2.0f, -20.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
+	ambientLight = DirectX::XMFLOAT3(0.2f, 0.3f, 0.4f);
 }
 
 // --------------------------------------------------------
@@ -153,10 +154,10 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(mesh3);
 
 	// Creates Materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), vertexShader, pixelShader));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f), vertexShader, customPS));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader, 0.0f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.25f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 1.0f));
 
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
@@ -171,14 +172,6 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(mesh8);
 	std::shared_ptr<Mesh> mesh9 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
 	meshes.push_back(mesh9);
-
-	// Creates 5 Entities
-	//entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
-	//entities.push_back(std::make_shared<Entity>(meshes[0], materials[0]));
-	//entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
-	//entities.push_back(std::make_shared<Entity>(meshes[1], materials[1]));
-	//entities.push_back(std::make_shared<Entity>(meshes[2], materials[2]));
-
 
 	entities.push_back(std::make_shared<Entity>(meshes[3], materials[3]));
 	entities.push_back(std::make_shared<Entity>(meshes[4], materials[2]));
@@ -286,6 +279,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Defines the Vertex Shader data
 		std::shared_ptr<SimpleVertexShader> vs = entities[i]->GetMaterial()->GetVertexShader();
 		vs->SetMatrix4x4("world", entities[i]->GetTransform()->GetWorldMatrix());
+		vs->SetMatrix4x4("worldInvTranspose", entities[i]->GetTransform()->GetWorldInverseTranposeMatrix());
 		vs->SetMatrix4x4("view", camera->GetViewMatrix());
 		vs->SetMatrix4x4("projection", camera->GetProjectionMatrix());
 		vs->CopyAllBufferData();
@@ -293,6 +287,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Defines the Pixel Shader data
 		std::shared_ptr<SimplePixelShader> ps = entities[i]->GetMaterial()->GetPixelShader();
 		ps->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());
+		ps->SetFloat("roughness", entities[i]->GetMaterial()->GetRoughness());
+		ps->SetFloat3("cameraPos", camera->GetTransform()->GetPosition());
+		ps->SetFloat3("ambientLight", ambientLight);
 		ps->CopyAllBufferData();
 
 		// Sets stride and offset

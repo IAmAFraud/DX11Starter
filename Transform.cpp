@@ -15,6 +15,7 @@ Transform::Transform()
 
 	// Creates the initial matrix
 	XMStoreFloat4x4(&worldMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&worldInverseTranspose, XMMatrixIdentity());
 	
 	// Set matrix bool
 	matrixDirty = false;
@@ -132,23 +133,20 @@ DirectX::XMFLOAT3 Transform::GetScale(){ return scale; }
 DirectX::XMFLOAT4X4 Transform::GetWorldMatrix()
 {
 	// Only updates the matrix if there was a change
-	if (matrixDirty)
-	{
-		// Create individual transformation matrices
-		XMMATRIX translationMatrix = XMMatrixTranslation(position.x, position.y, position.z);
-		XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z);
-		XMMATRIX scaleMatrix = XMMatrixScaling(scale.x, scale.y, scale.z);
-
-		// Combine transformations matrices and store result
-		XMMATRIX worldMat = scaleMatrix * rotationMatrix * translationMatrix;
-		XMStoreFloat4x4(&worldMatrix, worldMat);
-
-		// Mark matrix as clean
-		matrixDirty = false;
-	}
+	if (matrixDirty){ CreateWorldMatrices(); }
 	
 	// Returns the world matrix
 	return worldMatrix;
+}
+
+/// <summary>
+/// Getter that updates the world matrices if necessary before return the world inverse transpose matrix
+/// </summary>
+/// <returns>The world inverse transpose matrix</returns>
+DirectX::XMFLOAT4X4 Transform::GetWorldInverseTranposeMatrix()
+{
+	if (matrixDirty) { CreateWorldMatrices(); }
+	return worldInverseTranspose;
 }
 
 // Directional Vector Getters
@@ -168,4 +166,23 @@ void Transform::UpdateDirections()
 	XMStoreFloat3(&right, XMVector3Rotate(XMVectorSet(1, 0, 0, 0), rot));
 	XMStoreFloat3(&up, XMVector3Rotate(XMVectorSet(0, 1, 0, 0), rot));
 	XMStoreFloat3(&forward, XMVector3Rotate(XMVectorSet(0, 0, 1, 0), rot));
+}
+
+/// <summary>
+/// Helper function to create both world matrices if the matrices are dirty
+/// </summary>
+void Transform::CreateWorldMatrices()
+{
+	// Create individual transformation matrices
+	XMMATRIX translationMatrix = XMMatrixTranslation(position.x, position.y, position.z);
+	XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z);
+	XMMATRIX scaleMatrix = XMMatrixScaling(scale.x, scale.y, scale.z);
+
+	// Combine transformations matrices and store result
+	XMMATRIX worldMat = scaleMatrix * rotationMatrix * translationMatrix;
+	XMStoreFloat4x4(&worldMatrix, worldMat);
+	XMStoreFloat4x4(&worldInverseTranspose, XMMatrixInverse(0, XMMatrixTranspose(worldMat)));
+
+	// Mark matrix as clean
+	matrixDirty = false;
 }
