@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "SimpleShader.h"
 #include "Material.h"
+#include "Light.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -58,6 +59,11 @@ private:
 
 	// Lights
 	DirectX::XMFLOAT3 ambientLight;
+	Light directionalLight1;
+	Light directionalLight2;
+	Light directionalLight3;
+	Light pointLight1;
+	Light pointLight2;
 
 };
 

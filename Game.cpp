@@ -34,7 +34,6 @@ Game::Game(HINSTANCE hInstance)
 
 	// Create a Camera
 	camera = std::make_shared<Camera>(0.0f, 2.0f, -20.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
-	ambientLight = DirectX::XMFLOAT3(0.2f, 0.3f, 0.4f);
 }
 
 // --------------------------------------------------------
@@ -66,6 +65,47 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Sets up the light
+	ambientLight = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	// Directinal Light 1
+	directionalLight1 = {};
+	directionalLight1.Type = 0;
+	directionalLight1.Direction = DirectX::XMFLOAT3(1, -1, 0);
+	directionalLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	directionalLight1.Intensity = 0.5f;
+
+	// Directional Light 2
+	directionalLight2 = {};
+	directionalLight2.Type = 0;
+	directionalLight2.Direction = DirectX::XMFLOAT3(-1, -1, 0);
+	directionalLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	directionalLight2.Intensity = 0.5f;
+
+	// Directional Light 3
+	directionalLight3 = {};
+	directionalLight3.Type = 0;
+	directionalLight3.Direction = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	directionalLight3.Color = DirectX::XMFLOAT3(0.0, 0.0f, 1.0f);
+	directionalLight3.Intensity = 0.5f;
+
+	// Point Light 1
+	pointLight1 = {};
+	pointLight1.Type = 1;
+	pointLight1.Range = 7.0f;
+	pointLight1.Position = DirectX::XMFLOAT3(-2.0f, 5.0f, 0.0f);
+	pointLight1.Intensity = 1.0f;
+	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+	// Point Light 2
+	pointLight2 = {};
+	pointLight2.Type = 1;
+	pointLight2.Range = 15.0f;
+	pointLight2.Position = DirectX::XMFLOAT3(11.0f, 0.0f, 0.0f);
+	pointLight2.Intensity = 1.0f;
+	pointLight2.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+
 }
 
 // --------------------------------------------------------
@@ -154,10 +194,10 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(mesh3);
 
 	// Creates Materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f), vertexShader, pixelShader, 0.0f));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.25f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 1.0f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
 
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
@@ -287,9 +327,15 @@ void Game::Draw(float deltaTime, float totalTime)
 		// Defines the Pixel Shader data
 		std::shared_ptr<SimplePixelShader> ps = entities[i]->GetMaterial()->GetPixelShader();
 		ps->SetFloat4("colorTint", entities[i]->GetMaterial()->GetColorTint());
+		ps->SetFloat3("cameraPosition", camera->GetTransform()->GetPosition());
 		ps->SetFloat("roughness", entities[i]->GetMaterial()->GetRoughness());
 		ps->SetFloat3("cameraPos", camera->GetTransform()->GetPosition());
 		ps->SetFloat3("ambientLight", ambientLight);
+		ps->SetData("directionalLight1", &directionalLight1, sizeof(Light));
+		ps->SetData("directionalLight2", &directionalLight2, sizeof(Light));
+		ps->SetData("directionalLight3", &directionalLight3, sizeof(Light));
+		ps->SetData("pointLight1", &pointLight1, sizeof(Light));
+		ps->SetData("pointLight2", &pointLight2, sizeof(Light));
 		ps->CopyAllBufferData();
 
 		// Sets stride and offset
