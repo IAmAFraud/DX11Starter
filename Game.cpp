@@ -93,18 +93,18 @@ void Game::Init()
 	// Point Light 1
 	pointLight1 = {};
 	pointLight1.Type = 1;
-	pointLight1.Range = 7.0f;
-	pointLight1.Position = DirectX::XMFLOAT3(-2.0f, 5.0f, 0.0f);
+	pointLight1.Range = 2.0f;
+	pointLight1.Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	pointLight1.Intensity = 1.0f;
-	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
 
 	// Point Light 2
 	pointLight2 = {};
 	pointLight2.Type = 1;
-	pointLight2.Range = 15.0f;
-	pointLight2.Position = DirectX::XMFLOAT3(11.0f, 0.0f, 0.0f);
+	pointLight2.Range = 3.0f;
+	pointLight2.Position = DirectX::XMFLOAT3(4.0f, 1.0f, 0.0f);
 	pointLight2.Intensity = 1.0f;
-	pointLight2.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	pointLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
 
 }
 
@@ -266,11 +266,12 @@ void Game::Update(float deltaTime, float totalTime)
 	entities[4]->GetTransform()->SetPosition(6.0f, 0.0f, 0.0f);
 	entities[5]->GetTransform()->SetPosition(10.0f, 0.0f, 0.0f);
 
-
+	/*
 	std::shared_ptr<SimplePixelShader> ps = entities[0]->GetMaterial()->GetPixelShader();
 	ps->SetFloat("totalTime", totalTime);
 	ps = entities[5]->GetMaterial()->GetPixelShader();
 	ps->SetFloat("totalTime", totalTime);
+	*/
 
 	camera->Update(deltaTime);
 }
