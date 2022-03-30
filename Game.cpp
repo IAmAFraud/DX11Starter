@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Vertex.h"
 #include "Input.h"
+#include "WICTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -192,6 +193,19 @@ void Game::CreateBasicGeometry()
 	unsigned int indices3[] = { 1, 0, 3, 1, 2, 4, 2, 3, 5};
 	std::shared_ptr<Mesh> mesh3 = std::make_shared<Mesh>(vertices3, sizeof(vertices3)/sizeof(Vertex), indices3, sizeof(indices3)/sizeof(unsigned int), device, context);
 	meshes.push_back(mesh3);
+
+	// Creates a sampler state
+	D3D11_SAMPLER_DESC ssd = {};
+	ssd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	ssd.Filter = D3D11_FILTER_ANISOTROPIC;
+	ssd.MaxAnisotropy = 16;
+	ssd.MaxLOD = D3D11_FLOAT32_MAX;
+	device->CreateSamplerState(&ssd, samplerState.GetAddressOf());
+
+	// Loads in textures
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodPlanks1.png").c_str(), nullptr, texture1.GetAddressOf());
 
 	// Creates Materials
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));

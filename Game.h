@@ -43,6 +43,12 @@ private:
 	std::vector < std::shared_ptr<Material> > materials;
 	std::shared_ptr<Camera> camera;
 
+	// Textures
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1;
+
+	// Sampler State(s)
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+
 	// Note the usage of ComPtr below
 	//  - This is a smart pointer for objects that abide by the
 	//    Component Object Model, which DirectX objects do
