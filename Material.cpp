@@ -30,3 +30,22 @@ void Material::SetColorTint(DirectX::XMFLOAT4 _colorTint) { colorTint = _colorTi
 void Material::SetVertexShader(std::shared_ptr<SimpleVertexShader> _vertexShader) { vertexShader = _vertexShader; }
 void Material::SetPixelShader(std::shared_ptr<SimplePixelShader> _pixelShader) { pixelShader = _pixelShader; }
 void Material::SetRoughness(float _roughness) { roughness = _roughness; }
+
+
+void Material::AddTextureSRV(std::string name, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture)
+{
+	textureSRVs.insert({ name, texture });
+}
+
+
+void Material::AddSampler(std::string name, Microsoft::WRL::ComPtr<ID3D11SamplerState> state)
+{
+	samplers.insert({ name, state });
+}
+
+void Material::SetMaps()
+{
+	for (auto& t : textureSRVs) { pixelShader->SetShaderResourceView(t.first.c_str(), t.second); }
+	for (auto& s : samplers) { pixelShader->SetSamplerState(s.first.c_str(), s.second); }
+	pixelShader->CopyAllBufferData();
+}

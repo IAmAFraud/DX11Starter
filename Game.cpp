@@ -74,38 +74,38 @@ void Game::Init()
 	directionalLight1 = {};
 	directionalLight1.Type = 0;
 	directionalLight1.Direction = DirectX::XMFLOAT3(1, -1, 0);
-	directionalLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
-	directionalLight1.Intensity = 0.5f;
+	directionalLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight1.Intensity = 0.25f;
 
 	// Directional Light 2
 	directionalLight2 = {};
 	directionalLight2.Type = 0;
 	directionalLight2.Direction = DirectX::XMFLOAT3(-1, -1, 0);
-	directionalLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
-	directionalLight2.Intensity = 0.5f;
+	directionalLight2.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+	directionalLight2.Intensity = 0.25f;
 
 	// Directional Light 3
 	directionalLight3 = {};
 	directionalLight3.Type = 0;
 	directionalLight3.Direction = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
-	directionalLight3.Color = DirectX::XMFLOAT3(0.0, 0.0f, 1.0f);
-	directionalLight3.Intensity = 0.5f;
+	directionalLight3.Color = DirectX::XMFLOAT3(1.0, 1.0f, 1.0f);
+	directionalLight3.Intensity = 0.25f;
 
 	// Point Light 1
 	pointLight1 = {};
 	pointLight1.Type = 1;
 	pointLight1.Range = 2.0f;
 	pointLight1.Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-	pointLight1.Intensity = 1.0f;
-	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f);
+	pointLight1.Intensity = 0.25f;
+	pointLight1.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	// Point Light 2
 	pointLight2 = {};
 	pointLight2.Type = 1;
 	pointLight2.Range = 3.0f;
 	pointLight2.Position = DirectX::XMFLOAT3(4.0f, 1.0f, 0.0f);
-	pointLight2.Intensity = 1.0f;
-	pointLight2.Color = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
+	pointLight2.Intensity = 0.25f;
+	pointLight2.Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 }
 
@@ -212,6 +212,19 @@ void Game::CreateBasicGeometry()
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
+
+	// Adds the texture to the materials
+	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[0]->AddSampler("BasicSampler", samplerState);
+
+	materials[1]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[1]->AddSampler("BasicSampler", samplerState);
+
+	materials[2]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[2]->AddSampler("BasicSampler", samplerState);
+
+	materials[3]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[3]->AddSampler("BasicSampler", samplerState);
 
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
@@ -351,6 +364,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		ps->SetData("directionalLight3", &directionalLight3, sizeof(Light));
 		ps->SetData("pointLight1", &pointLight1, sizeof(Light));
 		ps->SetData("pointLight2", &pointLight2, sizeof(Light));
+		//entities[i]->GetMaterial()->SetMaps();
+		ps->SetShaderResourceView("SurfaceTexture", texture1);
+		ps->SetSamplerState("BasicSampler", samplerState);
 		ps->CopyAllBufferData();
 
 		// Sets stride and offset

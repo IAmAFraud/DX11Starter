@@ -15,6 +15,9 @@ cbuffer ExternalData : register(b0)
 	Light pointLight2;
 }
 
+Texture2D SurfaceTexture	: register(t0);
+SamplerState BasicSampler	: register(s0);
+
 float3 Attenuate(Light light, float3 worldPos)
 {
 	float dist = distance(light.Position, worldPos);
@@ -43,7 +46,7 @@ float3 CalculateDirectionalLight(Light light, VertexToPixel inputData)
 	
 
 	// Calculate the final color
-	float3 lightColor = (diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular;
+	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * light.Intensity;
 	return lightColor;
 }
 
@@ -67,7 +70,7 @@ float3 CalculatePointLight(Light light, VertexToPixel inputData)
 	}
 
 	// Calculate the final color
-	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * Attenuate(light, inputData.worldPosition);
+	float3 lightColor = ((diffuseAmount * light.Color * colorTint) + (ambientLight * colorTint) + specular) * Attenuate(light, inputData.worldPosition) * light.Intensity;
 	return lightColor;
 }
 
@@ -86,7 +89,14 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Normalize the normals
 	input.normal = normalize(input.normal);
 
-	float3 finalColor = CalculateDirectionalLight(directionalLight1, input) + CalculateDirectionalLight(directionalLight2, input) + CalculateDirectionalLight(directionalLight3, input);
+	// Sets texture colors
+	float3 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv).rgb;
+
+	// Tints the surface color with material surface
+	//surfaceColor = surfaceColor * colorTint;
+
+	// Adds lights values to the object
+	float3 finalColor = surfaceColor + CalculateDirectionalLight(directionalLight1, input) + CalculateDirectionalLight(directionalLight2, input) + CalculateDirectionalLight(directionalLight3, input);
 	finalColor += CalculatePointLight(pointLight1, input) + CalculatePointLight(pointLight2, input);
 
 	return float4(finalColor, 1);
