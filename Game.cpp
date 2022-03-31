@@ -205,13 +205,14 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&ssd, samplerState.GetAddressOf());
 
 	// Loads in textures
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/woodPlanks1.png").c_str(), nullptr, texture1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/sandstoneBrick1.png").c_str(), nullptr, texture1.GetAddressOf());
 
 	// Creates Materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 5.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 10.0f, XMFLOAT2(0.0f, 0.2f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 0.1f, XMFLOAT2(1.0f, 1.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 0.5f, XMFLOAT2(0.5f, 0.5f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 5.0f, XMFLOAT2(0.0f, 0.05f)));
 
 	// Adds the texture to the materials
 	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
@@ -225,6 +226,11 @@ void Game::CreateBasicGeometry()
 
 	materials[3]->AddTextureSRV("SurfaceTexture", texture1);
 	materials[3]->AddSampler("BasicSampler", samplerState);
+
+	materials[4]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[4]->AddSampler("BasicSampler", samplerState);
+
+
 
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
@@ -244,7 +250,7 @@ void Game::CreateBasicGeometry()
 	entities.push_back(std::make_shared<Entity>(meshes[4], materials[2]));
 	entities.push_back(std::make_shared<Entity>(meshes[5], materials[0]));
 	entities.push_back(std::make_shared<Entity>(meshes[6], materials[0]));
-	entities.push_back(std::make_shared<Entity>(meshes[7], materials[2]));
+	entities.push_back(std::make_shared<Entity>(meshes[7], materials[4]));
 	entities.push_back(std::make_shared<Entity>(meshes[8], materials[3]));
 }
 
@@ -359,14 +365,14 @@ void Game::Draw(float deltaTime, float totalTime)
 		ps->SetFloat("roughness", entities[i]->GetMaterial()->GetRoughness());
 		ps->SetFloat3("cameraPos", camera->GetTransform()->GetPosition());
 		ps->SetFloat3("ambientLight", ambientLight);
+		ps->SetFloat("uvScale", entities[i]->GetMaterial()->GetUvScale());
+		ps->SetFloat2("uvOffset", entities[i]->GetMaterial()->GetUvOffset());
 		ps->SetData("directionalLight1", &directionalLight1, sizeof(Light));
 		ps->SetData("directionalLight2", &directionalLight2, sizeof(Light));
 		ps->SetData("directionalLight3", &directionalLight3, sizeof(Light));
 		ps->SetData("pointLight1", &pointLight1, sizeof(Light));
 		ps->SetData("pointLight2", &pointLight2, sizeof(Light));
-		//entities[i]->GetMaterial()->SetMaps();
-		ps->SetShaderResourceView("SurfaceTexture", texture1);
-		ps->SetSamplerState("BasicSampler", samplerState);
+		entities[i]->GetMaterial()->SetMaps();
 		ps->CopyAllBufferData();
 
 		// Sets stride and offset

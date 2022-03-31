@@ -8,6 +8,8 @@ cbuffer ExternalData : register(b0)
 	float roughness;
 	float3 cameraPos;
 	float3 ambientLight;
+	float uvScale;
+	float2 uvOffset;
 	Light directionalLight1;
 	Light directionalLight2;
 	Light directionalLight3;
@@ -89,11 +91,14 @@ float4 main(VertexToPixel input) : SV_TARGET
 	// Normalize the normals
 	input.normal = normalize(input.normal);
 
+	// Scales/Shifts the uvs
+	input.uv = (input.uv + uvOffset) * uvScale;
+
 	// Sets texture colors
 	float3 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv).rgb;
 
 	// Tints the surface color with material surface
-	//surfaceColor = surfaceColor * colorTint;
+	surfaceColor = surfaceColor * colorTint;
 
 	// Adds lights values to the object
 	float3 finalColor = surfaceColor + CalculateDirectionalLight(directionalLight1, input) + CalculateDirectionalLight(directionalLight2, input) + CalculateDirectionalLight(directionalLight3, input);
