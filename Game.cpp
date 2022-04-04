@@ -205,7 +205,8 @@ void Game::CreateBasicGeometry()
 	device->CreateSamplerState(&ssd, samplerState.GetAddressOf());
 
 	// Loads in textures
-	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/sandstoneBrick1.png").c_str(), nullptr, texture1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion.png").c_str(), nullptr, texture1.GetAddressOf());
+	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normal1.GetAddressOf());
 
 	// Creates Materials
 	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 5.0f, XMFLOAT2(0.0f, 0.0f)));
@@ -216,18 +217,23 @@ void Game::CreateBasicGeometry()
 
 	// Adds the texture to the materials
 	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[0]->AddTextureSRV("NormalMap", normal1);
 	materials[0]->AddSampler("BasicSampler", samplerState);
 
 	materials[1]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[1]->AddTextureSRV("NormalMap", normal1);
 	materials[1]->AddSampler("BasicSampler", samplerState);
 
 	materials[2]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[2]->AddTextureSRV("NormalMap", normal1);
 	materials[2]->AddSampler("BasicSampler", samplerState);
 
 	materials[3]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[3]->AddTextureSRV("NormalMap", normal1);
 	materials[3]->AddSampler("BasicSampler", samplerState);
 
 	materials[4]->AddTextureSRV("SurfaceTexture", texture1);
+	materials[4]->AddTextureSRV("NormalMap", normal1);
 	materials[4]->AddSampler("BasicSampler", samplerState);
 
 

@@ -14,6 +14,9 @@ class Mesh
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context;
 		int numIndices;
 
+		// Methods
+		void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
+
 	public:
 		// Constructors
 		Mesh(

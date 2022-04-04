@@ -45,6 +45,7 @@ private:
 
 	// Textures
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normal1;
 
 	// Sampler State(s)
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;

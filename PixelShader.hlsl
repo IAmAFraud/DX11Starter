@@ -18,6 +18,7 @@ cbuffer ExternalData : register(b0)
 }
 
 Texture2D SurfaceTexture	: register(t0);
+Texture2D NormalMap			: register(t1);
 SamplerState BasicSampler	: register(s0);
 
 float3 Attenuate(Light light, float3 worldPos)
@@ -93,6 +94,19 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	// Scales/Shifts the uvs
 	input.uv = (input.uv + uvOffset) * uvScale;
+
+	// Unpacks the normals
+	float3 unpackedNormal = NormalMap.Sample(BasicSampler, input.uv).rgb * 2 - 1;
+
+	// Creates a TBN matrix
+	float3 N = input.normal;
+	float3 T = normalize(input.tangent);
+	T = normalize(T - N * dot(T, N));
+	float3 B = cross(T, N);
+	float3x3 TBN = float3x3(T, B, N);
+
+	// Transform the unpacked normal
+	input.normal = mul(unpackedNormal, TBN);
 
 	// Sets texture colors
 	float3 surfaceColor = SurfaceTexture.Sample(BasicSampler, input.uv).rgb;
