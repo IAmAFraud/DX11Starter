@@ -8,6 +8,7 @@
 #include "SimpleShader.h"
 #include "Material.h"
 #include "Light.h"
+#include "Sky.h"
 #include <DirectXMath.h>
 #include <wrl/client.h> // Used for ComPtr - a smart pointer for COM objects
 #include <memory>
@@ -63,6 +64,8 @@ private:
 	std::shared_ptr<SimpleVertexShader> vertexShader;
 	std::shared_ptr<SimplePixelShader> pixelShader;
 	std::shared_ptr<SimplePixelShader> customPS;
+	std::shared_ptr<SimpleVertexShader> skyVertexShader;
+	std::shared_ptr<SimplePixelShader> skyPixelShader;
 
 	// Lights
 	DirectX::XMFLOAT3 ambientLight;
@@ -72,5 +75,8 @@ private:
 	Light pointLight1;
 	Light pointLight2;
 
+	// Skybox + Texture
+	std::shared_ptr<Sky> skybox;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> skyboxTexture;
 };
 

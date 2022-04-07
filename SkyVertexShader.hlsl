@@ -30,7 +30,7 @@ VertexToPixel main(VertexShaderInput input)
 	copyView._34 = 0;
 
 	// Apply view and projection matrix to position
-	matrix viewProj = mul(projection, viewNoTranslation);
+	matrix viewProj = mul(projectionMatrix, copyView);
 	output.position = mul(viewProj, float4(input.localPosition, 1.0f));
 
 	// Set output depth to exactly 1.0f

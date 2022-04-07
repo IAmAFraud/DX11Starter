@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "Input.h"
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 // Needed for a helper function to read compiled shader files from the hard drive
 #pragma comment(lib, "d3dcompiler.lib")
@@ -32,7 +33,6 @@ Game::Game(HINSTANCE hInstance)
 	CreateConsoleWindow(500, 120, 32, 120);
 	printf("Console window created successfully.  Feel free to printf() here.\n");
 #endif
-
 	// Create a Camera
 	camera = std::make_shared<Camera>(0.0f, 2.0f, -20.0f, (float)width/height, XM_PIDIV4, 0.01f, 1000.0f);
 }
@@ -68,7 +68,7 @@ void Game::Init()
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Sets up the light
-	ambientLight = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	ambientLight = DirectX::XMFLOAT3(0.0f, 0.0f, 0.05f);
 
 	// Directinal Light 1
 	directionalLight1 = {};
@@ -123,6 +123,8 @@ void Game::LoadShaders()
 	vertexShader = std::make_shared<SimpleVertexShader>(device, context, GetFullPathTo_Wide(L"VertexShader.cso").c_str());
 	pixelShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"PixelShader.cso").c_str());
 	customPS = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"CustomPS.cso").c_str());
+	skyVertexShader = std::make_shared<SimpleVertexShader>(device, context, GetFullPathTo_Wide(L"SkyVertexShader.cso").c_str());
+	skyPixelShader = std::make_shared<SimplePixelShader>(device, context, GetFullPathTo_Wide(L"SkyPixelShader.cso").c_str());
 }
 
 
@@ -209,11 +211,11 @@ void Game::CreateBasicGeometry()
 	CreateWICTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/cushion_normals.png").c_str(), nullptr, normal1.GetAddressOf());
 
 	// Creates Materials
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 5.0f, XMFLOAT2(0.0f, 0.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 10.0f, XMFLOAT2(0.0f, 0.2f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 0.1f, XMFLOAT2(1.0f, 1.0f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 0.5f, XMFLOAT2(0.5f, 0.5f)));
-	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 5.0f, XMFLOAT2(0.0f, 0.05f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 1.0f, XMFLOAT2(0.0f, 0.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 1.0f, XMFLOAT2(0.0f, 0.2f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 1.0f, XMFLOAT2(1.0f, 1.0f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 1.0f, XMFLOAT2(0.5f, 0.5f)));
+	materials.push_back(std::make_shared<Material>(XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), vertexShader, pixelShader, 0.5f, 1.0f, XMFLOAT2(0.0f, 0.05f)));
 
 	// Adds the texture to the materials
 	materials[0]->AddTextureSRV("SurfaceTexture", texture1);
@@ -236,8 +238,6 @@ void Game::CreateBasicGeometry()
 	materials[4]->AddTextureSRV("NormalMap", normal1);
 	materials[4]->AddSampler("BasicSampler", samplerState);
 
-
-
 	// Creates mesh from 3D object
 	std::shared_ptr<Mesh> mesh4 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/sphere.obj").c_str(), device);
 	meshes.push_back(mesh4);
@@ -251,6 +251,8 @@ void Game::CreateBasicGeometry()
 	meshes.push_back(mesh8);
 	std::shared_ptr<Mesh> mesh9 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/torus.obj").c_str(), device);
 	meshes.push_back(mesh9);
+	std::shared_ptr<Mesh> mesh10 = std::make_shared<Mesh>(GetFullPathTo("../../Assets/Models/cube.obj").c_str(), device);
+	meshes.push_back(mesh10);
 
 	entities.push_back(std::make_shared<Entity>(meshes[3], materials[3]));
 	entities.push_back(std::make_shared<Entity>(meshes[4], materials[2]));
@@ -258,6 +260,10 @@ void Game::CreateBasicGeometry()
 	entities.push_back(std::make_shared<Entity>(meshes[6], materials[0]));
 	entities.push_back(std::make_shared<Entity>(meshes[7], materials[4]));
 	entities.push_back(std::make_shared<Entity>(meshes[8], materials[3]));
+
+	// Creates the skybox texture
+	CreateDDSTextureFromFile(device.Get(), context.Get(), GetFullPathTo_Wide(L"../../Assets/Textures/sunnyCubeMap.dds").c_str(), nullptr, skyboxTexture.GetAddressOf());
+	skybox = std::make_shared<Sky>(meshes[9], samplerState, device, skyVertexShader, skyPixelShader, skyboxTexture);
 }
 
 
@@ -395,6 +401,9 @@ void Game::Draw(float deltaTime, float totalTime)
 			0,
 			0);
 	}
+
+	// Draws the skybox
+	skybox->Draw(context, camera);
 	
 
 	// Present the back buffer to the user
