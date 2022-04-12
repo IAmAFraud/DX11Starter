@@ -48,6 +48,37 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture1;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normal1;
 
+	// PBR Textures
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness1;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness1;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness2;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo3;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals3;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness3;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness3;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo4;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals4;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness4;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness4;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo5;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals5;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness5;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness5;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> albedo6;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> normals6;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> roughness6;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> metalness6;
+
 	// Sampler State(s)
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 
